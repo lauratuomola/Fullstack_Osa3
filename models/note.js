@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 // korvaa url oman tietokantasi urlilla. ethän laita salasanaa Githubiin!
-const url = 'mongodb://person:fullstack1@ds219983.mlab.com:19983/puhelinluettelo-fullstack'
+const url = process.env.MONGODB_URI
 
 mongoose.connect(url)
 
