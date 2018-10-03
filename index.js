@@ -3,6 +3,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const morgan= require('morgan')
 const cors = require('cors')
+const Person = require('./models/note')
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -33,6 +34,15 @@ let persons = [
     }
 
 ]
+
+const formatPerson = (person) => {
+    return {
+      name: person.name,
+      number: person.number,
+      id: person._id
+    }
+  }
+
 app.get('/info', (request, response) => {
     const yht = persons.length
     const pvm = new Date()
@@ -40,22 +50,29 @@ app.get('/info', (request, response) => {
     response.send(tiedot)
 })
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person= persons.find(person => person.id === id)
-    if (person) {
-        response.json(person)
-      } else {
-        response.status(404).end()
-      }
+   Person
+        .findById(request.params.id)
+        .then (person => {
+            response.json(formatPerson(person))
+        })
 })
+
 app.get('/api/persons', (request, response) => {
-    response.send(persons)
+    Person
+    .find({})
+    .then(persons => {
+      response.json(persons.map(formatPerson))
+    })
 })
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(person => person.id !== id)
-  
-    response.status(204).end()
+    Person
+    .findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => {
+      response.status(400).send({ error: 'malformatted id' })
+    })
   })
 app.post('/api/persons', (request,response) => {
     const body = request.body
@@ -65,19 +82,22 @@ app.post('/api/persons', (request,response) => {
     if (body.number === undefined) {
         return response.status(400).json({ error: 'number missing' })
       }
-    const person = {
+
+    const person = new Person({
         name: body.name,
         number: body.number,
         id: Math.floor(Math.random() * 100)
-      }
+      })
 
     const names = persons.map(nimi => nimi.name)
 
     if (names.includes(person.name)){
         return response.status(400).json({ error: 'name must be unique' })
     }
-    persons = persons.concat(person)
-    response.json(person)
+    person.save()
+        .then(savedPerson => {
+            response.json(formatPerson(savedPerson))
+        })
 })
 
 const PORT = process.env.PORT || 3001
