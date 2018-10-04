@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const morgan= require('morgan')
 const cors = require('cors')
 const Person = require('./models/note')
+require('dotenv').config()
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -76,6 +77,7 @@ app.delete('/api/persons/:id', (request, response) => {
   })
 app.post('/api/persons', (request,response) => {
     const body = request.body
+   
     if (body.name === undefined) {
         return response.status(400).json({ error: 'name missing' })
       }
@@ -94,10 +96,12 @@ app.post('/api/persons', (request,response) => {
     if (names.includes(person.name)){
         return response.status(400).json({ error: 'name must be unique' })
     }
-    person.save()
+    if (body.name !== undefined && body.number !== undefined) {
+        person.save()
         .then(savedPerson => {
             response.json(formatPerson(savedPerson))
         })
+    }
 })
 
 const PORT = process.env.PORT || 3001
