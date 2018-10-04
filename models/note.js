@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 // korvaa url oman tietokantasi urlilla. ethän laita salasanaa Githubiin!
-if ( process.env.NODE_ENV !== 'production' ) {
+if ( process.env.MONGODB_URI !== 'production' ) {
     require('dotenv').config()
   }
 const url = process.env.MONGODB_URI
@@ -14,3 +14,4 @@ const Person = mongoose.model('Person', {
 })
 
 module.exports = Person
+
