@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+
 if ( process.env.MONGODB_URI !== 'production' ) {
     require('dotenv').config()
   }
@@ -10,8 +11,6 @@ const Person = mongoose.model('Person', {
   name: String,
   number: String
 })
-
-
 const person = new Person({
     name: process.argv.slice(2)[0],
     number: process.argv.slice(2)[1]
@@ -22,7 +21,7 @@ if (person.name !== undefined){
   .save()
   .then(response => {
     
-        console.log(`Lisätään henkilö ${person.name} numero ${person.number} luetteloon`) 
+    console.log(`Lisätään henkilö ${person.name} numero ${person.number} luetteloon`) 
     mongoose.connection.close()
   })} 
   else {
